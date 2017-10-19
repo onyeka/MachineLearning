@@ -75,8 +75,6 @@ hidden_layer = [ones(size(hidden_layer, 1), 1) hidden_layer];
 % compute the output layer activation units of the neural network [5000 x 10]
 [output_layer] = sigmoid(hidden_layer * Theta2');
 
-fprintf('\n output layer:[%d x %d]\n', size(output_layer));
-
 % compute the cost function without the sum portion
 J_comp = zeros(size(output_layer));
 for i=1:size(output_layer, 2),
@@ -88,8 +86,14 @@ end
 % compute the cost function of the neural network
 J = (1/m) * sum(sum(J_comp));
 
+% compute the regularization element of the cost function
+reg_theta1 = sum(sum(Theta1(:, 2:end).^2));
+reg_theta2 = sum(sum(Theta2(:, 2:end).^2));
+reg_cost   = (lambda/(2*m)) * (reg_theta1 + reg_theta2);
 
 
+% compute the regularized cost function of the neural network
+J = J + reg_cost;
 
 
 
