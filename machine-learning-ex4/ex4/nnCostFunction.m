@@ -22,6 +22,7 @@ Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
 Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                  num_labels, (hidden_layer_size + 1));
 
+
 % Setup some useful variables
 m = size(X, 1);
          
@@ -62,6 +63,30 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% add the column of bias units to the examples
+X = [ones(m, 1) X];
+
+% compute the hidden layer activation units of the neural network [5000 x 25]
+[hidden_layer] = sigmoid(X * Theta1');
+
+% add the column of bias units to the hidden layers
+hidden_layer = [ones(size(hidden_layer, 1), 1) hidden_layer];
+
+% compute the output layer activation units of the neural network [5000 x 10]
+[output_layer] = sigmoid(hidden_layer * Theta2');
+
+fprintf('\n output layer:[%d x %d]\n', size(output_layer));
+
+% compute the cost function without the sum portion
+J_comp = zeros(size(output_layer));
+for i=1:size(output_layer, 2),
+    y_tmp = y==i;
+    ol_tmp = output_layer(:, i);
+    J_comp(:,i) = (-y_tmp .* log(ol_tmp)) - ( (1 - y_tmp) .* log(1 - ol_tmp));
+end
+
+% compute the cost function of the neural network
+J = (1/m) * sum(sum(J_comp));
 
 
 
