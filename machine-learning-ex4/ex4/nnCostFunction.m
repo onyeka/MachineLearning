@@ -75,16 +75,9 @@ hidden_layer = [ones(size(hidden_layer, 1), 1) hidden_layer];
 % compute the output layer activation units of the neural network [5000 x 10]
 [output_layer] = sigmoid(hidden_layer * Theta2');
 
-% compute the cost function without the sum portion
-J_comp = zeros(size(output_layer));
-for i=1:size(output_layer, 2),
-    y_tmp = y==i;
-    ol_tmp = output_layer(:, i);
-    J_comp(:,i) = (-y_tmp .* log(ol_tmp)) - ( (1 - y_tmp) .* log(1 - ol_tmp));
-end
-
 % compute the cost function of the neural network
-J = (1/m) * sum(sum(J_comp));
+yv = [1:num_labels] == y;
+J = (1/m) * sum( sum( (-yv .* log(output_layer)) - ( (1 - yv) .* log(1 - output_layer)) ) );
 
 % compute the regularization element of the cost function
 reg_theta1 = sum(sum(Theta1(:, 2:end).^2));
@@ -96,8 +89,35 @@ reg_cost   = (lambda/(2*m)) * (reg_theta1 + reg_theta2);
 J = J + reg_cost;
 
 
+% compute backpropagation
+for t=1:m,
+    a_1 = X(t, :);                      % assign activation units for input layer [1 x 401]
+    z_2 = a_1 * Theta1';                % compute the z vector of the hidden layer [1 x 25]
+    z_2 = z_2(:);                       % convert row vector to column vector [25 x 1]
+    a_2 = sigmoid(z_2);                 % compute activation units for hidden layer
 
+    a_2 = [1; a_2];                     % add bias unit to activation units [26 x 1]
+    z_3 = Theta2 * a_2;                 % compute the z vector of the output layer [10 x 1]
+    a_3 = sigmoid(z_3);                 % compute activation units for output layer [10 x 1]
 
+    L_3 = size(a_3, 1);                 % number of units in output layer [10]
+    d_3 = zeros(size(a_3));             % error of node in output layer [10 x 1]
+
+    % compute the error in the output layer using back propagation
+    d_3 = a_3 - yv(t, :)';
+
+    % compute the error in the hidden layer using back propagation
+    tmp = Theta2' * d_3;
+    d_2 = tmp(2:end) .* sigmoidGradient(z_2); % error of node in hidden layer [25x1]
+
+    % accumulate the errors to compute the gradients
+    Theta2_grad = Theta2_grad + d_3 * a_2';
+    Theta1_grad = Theta1_grad + d_2 * a_1;
+end
+
+% compute the unregularized gradients for the neural network
+Theta2_grad = Theta2_grad/m;
+Theta1_grad = Theta1_grad/m;
 
 
 
