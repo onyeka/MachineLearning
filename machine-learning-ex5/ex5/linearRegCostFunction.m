@@ -28,19 +28,15 @@ sqrErrors = (predictions - y).^2;              % square errors
 % compute regularized linear regression cost function
 J = (1/(2 * m)) * sum(sqrErrors) + reg_term;
 
-
-
-
-
-
-
-
-
-
-
-
-% =========================================================================
+% compute the unregularized linear regression gradient
+grad = (1/m) * sum( (predictions - y) .* X);
+temp = theta;
+temp(1) = 0;                                   % because we don't regularize theta 0
 
 grad = grad(:);
+% add the regularization term to the 
+grad = grad + ((lambda/m) * temp);
+
+% =========================================================================
 
 end
