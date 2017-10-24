@@ -115,9 +115,15 @@ for t=1:m,
     Theta1_grad = Theta1_grad + d_2 * a_1;
 end
 
-% compute the unregularized gradients for the neural network
-Theta2_grad = Theta2_grad/m;
-Theta1_grad = Theta1_grad/m;
+% compute regularized component of the gradient
+reg_Theta1_grad = (lambda/m) * Theta1;
+reg_Theta2_grad = (lambda/m) * Theta2;
+reg_Theta1_grad(:, 1) = 0;
+reg_Theta2_grad(:, 1) = 0;
+
+% compute the regularized gradients for the neural network
+Theta1_grad = Theta1_grad/m + reg_Theta1_grad;
+Theta2_grad = Theta2_grad/m + reg_Theta2_grad;
 
 
 
